@@ -4,7 +4,7 @@ if (!process.env.MONGO_URL) {
   throw new Error("MONGO_URL not set");
 }
 
-await mongoose.connect(process.env.MONGO_URL, {
+mongoose.connect(process.env.MONGO_URL, {
   dbName: "CareGuide",
   appName: "Care Guide Backend",
   retryWrites: true,
