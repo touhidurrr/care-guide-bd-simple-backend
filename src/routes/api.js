@@ -7,7 +7,7 @@ const { execSync } = require("child_process");
 const jwt = require("../plugins/jwt");
 const { User, Post } = require("../mongoose");
 
-const { JWT_SECRET, DOMAIN } = process.env;
+const { JWT_SECRET } = process.env;
 if (!JWT_SECRET) {
   throw new Error("JWT_SECRET is not defined");
 }
@@ -64,10 +64,8 @@ router.post("/login", async ({ body }, res) => {
 
   const token = await signer.sign(jwtKey);
 
-  const domain = DOMAIN ?? "localhost";
   return res
     .cookie("token", token, {
-      domain,
       httpOnly: true,
       secure: true,
       maxAge: 24 * 3600 * 1000,
