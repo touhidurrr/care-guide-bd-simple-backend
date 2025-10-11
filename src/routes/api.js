@@ -33,10 +33,13 @@ router.post("/login", async ({ body }, res) => {
     return res.status(400).json({ error: "Username or email is required" });
   }
 
-  const user = await User.findOne({
-    ...(username ?? { username }),
-    ...(email ?? { email }),
-  });
+  const user = await User.findOne(
+    {
+      ...(username && { username }),
+      ...(email && { email }),
+    },
+    { _id: 0 },
+  );
 
   if (!user) {
     return res.status(401).json({ error: "Invalid username or password" });
