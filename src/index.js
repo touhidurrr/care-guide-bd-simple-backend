@@ -4,7 +4,7 @@ const api = require("./routes/api");
 
 const app = express();
 
-app.use("/api", api);
+app.use(api);
 
 const host = process.env.HOST ?? "0.0.0.0";
 const port = process.env.PORT ?? 4041;
