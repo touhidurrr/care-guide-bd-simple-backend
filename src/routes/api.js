@@ -5,6 +5,7 @@ const { SignJWT } = require("jose");
 const cookieParser = require("cookie-parser");
 const jwt = require("../plugins/jwt");
 const { User, Post } = require("../plugins/mongoose");
+const { execSync } = require("child_process");
 
 const { JWT_SECRET, DOMAIN } = process.env;
 if (!JWT_SECRET) {
@@ -129,6 +130,19 @@ router.get("/users", async ({ admin }, res) => {
 
   const users = await User.find({}, { _id: 0, hash: 0 }, { createdAt: -1 });
   return res.json(users);
+});
+
+/**
+ * Ok, why not also let admins restart the server?
+ * We can call this from CI/CD also
+ */
+router.get("/restart", async ({ admin }, res) => {
+  if (!admin) return res.status(403).json({ error: "Forbidden" });
+
+  const outputs = [execSync("git pull")];
+
+  res.json({ outputs: outputs.map((o) => o.toString("utf8")) });
+  process.exit(0);
 });
 
 module.exports = router;
