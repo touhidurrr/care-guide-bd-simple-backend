@@ -7,7 +7,7 @@ const { execSync } = require("child_process");
 const jwt = require("../plugins/jwt");
 const { User, Post } = require("../mongoose");
 
-const { JWT_SECRET, DOMAIN } = process.env;
+const { JWT_SECRET } = process.env;
 if (!JWT_SECRET) {
   throw new Error("JWT_SECRET is not defined");
 }
