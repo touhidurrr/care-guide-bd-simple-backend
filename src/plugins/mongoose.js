@@ -5,7 +5,7 @@ if (!process.env.MONGO_URL) {
 }
 
 mongoose.connect(process.env.MONGO_URL, {
-  dbName: "CareGuide",
+  dbName: "care_guide",
   appName: "Care Guide Backend",
   retryWrites: true,
   compressors: ["zstd"],

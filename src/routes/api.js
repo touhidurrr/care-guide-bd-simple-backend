@@ -14,16 +14,11 @@ const router = express.Router();
 
 router.use(express.json());
 
-const loginSchema = z.union([
-  z.object({
-    username: z.string().min(1).max(32),
-    password: z.string().min(6).max(512),
-  }),
-  z.object({
-    email: z.email(),
-    password: z.string().min(6).max(512),
-  }),
-]);
+const loginSchema = z.object({
+  email: z.email().optional(),
+  username: z.string().min(1).max(32).optional(),
+  password: z.string().min(6).max(512),
+});
 
 router.post("/login", async (req, res) => {
   const { success, data, error } = z.safeParse(loginSchema, req.body);
@@ -32,8 +27,14 @@ router.post("/login", async (req, res) => {
     return res.status(400).json({ error });
   }
 
+  const { username, password } = data;
+  if (!username && !email) {
+    return res.status(400).json({ error: "Username or email is required" });
+  }
+
   const user = await User.findOne({
-    $or: [{ username: `${data.username}` }, { email: data.email }],
+    ...(username ?? { username }),
+    ...(email ?? { email }),
   });
 
   if (!user) {
@@ -45,7 +46,7 @@ router.post("/login", async (req, res) => {
     return res.status(401).json({ error: "Invalid username or password" });
   }
 
-  const token = await new SignJWT({
+  const signer = new SignJWT({
     username: user.username,
     admin: user.admin,
     name: user.name,
@@ -53,8 +54,9 @@ router.post("/login", async (req, res) => {
     .setProtectedHeader({ alg: "HS512" })
     .setIssuedAt()
     .setExpirationTime("1 day")
-    .setIssuer("CareGuideBD")
-    .sign(process.env.JWT_SECRET);
+    .setIssuer("CareGuideBD");
+
+  const token = await signer.sign(process.env.JWT_SECRET);
 
   const domain = process.env.DOMAIN ?? "localhost";
   return res
