@@ -3,9 +3,9 @@ const argon2 = require("argon2");
 const express = require("express");
 const { SignJWT } = require("jose");
 const cookieParser = require("cookie-parser");
-const jwt = require("../plugins/jwt");
-const { User, Post } = require("../plugins/mongoose");
 const { execSync } = require("child_process");
+const jwt = require("../plugins/jwt");
+const { User, Post } = require("../mongoose");
 
 const { JWT_SECRET, DOMAIN } = process.env;
 if (!JWT_SECRET) {
@@ -15,6 +15,8 @@ if (!JWT_SECRET) {
 const router = express.Router();
 
 router.use(express.json());
+router.use(cookieParser());
+router.use(jwt);
 
 const loginSchema = z.object({
   email: z.email().optional(),
@@ -99,9 +101,6 @@ router.post("/register", async ({ body }, res) => {
   const user = await User.create({ username, name, email, hash });
   return res.json(user.toObject());
 });
-
-router.use(cookieParser());
-router.use(jwt);
 
 router.get("/posts", async (_, res) => {
   const posts = await Post.find({}, { _id: 0 }, { createdAt: -1 });

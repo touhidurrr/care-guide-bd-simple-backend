@@ -5,9 +5,16 @@ if (!JWT_SECRET) {
   throw new Error("JWT_SECRET is not defined");
 }
 
-module.exports = async function ({ cookies: { token } }, res, next) {
+const ignoredPaths = ["/login", "/register"];
+
+module.exports = async function (req, res, next) {
+  if (ignoredPaths.includes(req.path)) {
+    return next();
+  }
+
+  const { token } = req.cookies;
   if (typeof token !== "string") {
-    return res.status(400).json({ error: "Bad Request" });
+    return res.status(403).json({ error: "Forbidden" });
   }
 
   try {
@@ -16,9 +23,8 @@ module.exports = async function ({ cookies: { token } }, res, next) {
     });
 
     req.user = payload;
+    return next();
   } catch {
     return res.status(401).json({ error: "Unauthorized" });
   }
-
-  next();
 };
