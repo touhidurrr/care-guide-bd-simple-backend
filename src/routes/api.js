@@ -28,7 +28,7 @@ router.post("/login", async ({ body }, res) => {
   const { success, data, error } = z.safeParse(loginSchema, body);
   if (!success) return res.status(400).json({ error });
 
-  const { username, password } = data;
+  const { username, email, password } = data;
   if (!username && !email) {
     return res.status(400).json({ error: "Username or email is required" });
   }
