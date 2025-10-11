@@ -18,6 +18,8 @@ async function main() {
     password: PASSWORD,
   });
 
+  console.log("Logged in successfully!");
+
   const { data } = await api.get("/restart", {
     headers: { Cookie: `token=${token}` },
   });
@@ -26,4 +28,11 @@ async function main() {
   console.dir(data, { depth: null });
 }
 
-main();
+main().catch((err) => {
+  if (!axios.isAxiosError(err)) {
+    console.error(err.stack);
+    process.exit(1);
+  }
+
+  console.error(err.response);
+});
