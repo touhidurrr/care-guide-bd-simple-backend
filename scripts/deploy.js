@@ -31,8 +31,9 @@ async function main() {
 main().catch((err) => {
   if (!axios.isAxiosError(err)) {
     console.error(err.stack);
-    process.exit(1);
+  } else {
+    console.error(err.response);
   }
 
-  console.error(err.response);
+  process.exit(1);
 });
