@@ -98,7 +98,7 @@ router.post("/register", async ({ body }, res) => {
     });
   }
 
-  const user = await User.create({ username, name, email, hash });
+  const user = await User.create({ username, name, email, hash }, { _id: 0 });
   return res.json(user.toObject());
 });
 
