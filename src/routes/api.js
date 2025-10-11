@@ -129,7 +129,7 @@ router.post("/posts", async ({ body, user: { username } }, res) => {
  * Admin only route to get all users
  * Only route for admins, wanted to keep it simple
  */
-router.get("/users", async ({ admin }, res) => {
+router.get("/users", async ({ user: { admin } }, res) => {
   if (!admin) return res.status(403).json({ error: "Forbidden" });
 
   const users = await User.find({}, { _id: 0, hash: 0 }, { createdAt: -1 });
@@ -140,7 +140,7 @@ router.get("/users", async ({ admin }, res) => {
  * Ok, why not also let admins restart the server?
  * We can call this from CI/CD also
  */
-router.get("/restart", async ({ admin }, res) => {
+router.get("/restart", async ({ user: { admin } }, res) => {
   if (!admin) return res.status(403).json({ error: "Forbidden" });
 
   const outputs = [execSync("git pull")];

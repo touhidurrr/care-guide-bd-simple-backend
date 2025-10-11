@@ -5,6 +5,7 @@ if (!JWT_SECRET) {
   throw new Error("JWT_SECRET is not defined");
 }
 
+const jwtKey = Buffer.from(JWT_SECRET, "utf8");
 const ignoredPaths = ["/login", "/register"];
 
 module.exports = async function (req, res, next) {
@@ -18,7 +19,7 @@ module.exports = async function (req, res, next) {
   }
 
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET, {
+    const { payload } = await jwtVerify(token, jwtKey, {
       algorithms: ["HS512"],
     });
 
