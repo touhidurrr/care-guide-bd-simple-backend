@@ -24,6 +24,8 @@ const loginSchema = z.object({
   password: z.string().min(6).max(512),
 });
 
+const jwtKey = Buffer.from(JWT_SECRET, "utf8");
+
 router.post("/login", async ({ body }, res) => {
   const { success, data, error } = z.safeParse(loginSchema, body);
   if (!success) return res.status(400).json({ error });
@@ -60,7 +62,7 @@ router.post("/login", async ({ body }, res) => {
     .setExpirationTime("1 day")
     .setIssuer("CareGuideBD");
 
-  const token = await signer.sign(JWT_SECRET);
+  const token = await signer.sign(jwtKey);
 
   const domain = DOMAIN ?? "localhost";
   return res
@@ -68,9 +70,9 @@ router.post("/login", async ({ body }, res) => {
       domain,
       httpOnly: true,
       secure: true,
-      maxAge: 24 * 3600,
+      maxAge: 24 * 3600 * 1000,
     })
-    .redirect(`http://${domain}`);
+    .json({ token });
 });
 
 const registerSchema = z.object({
