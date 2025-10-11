@@ -23,4 +23,14 @@ const userSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+const postSchema = new mongoose.Schema(
+  {
+    username: { type: String, required: true },
+    title: { type: String, required: true },
+    content: { type: String, required: true },
+  },
+  { timestamps: true },
+);
+
 exports.User = mongoose.model("User", userSchema);
+exports.Post = mongoose.model("Post", postSchema);

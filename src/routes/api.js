@@ -4,7 +4,7 @@ const express = require("express");
 const { SignJWT } = require("jose");
 const cookieParser = require("cookie-parser");
 const jwt = require("../plugins/jwt");
-const { User } = require("../plugins/mongoose");
+const { User, Post } = require("../plugins/mongoose");
 
 const { JWT_SECRET, DOMAIN } = process.env;
 if (!JWT_SECRET) {
@@ -84,8 +84,12 @@ router.post("/register", async ({ body }, res) => {
   const { username, name, password, email } = data;
   const hash = await argon2.hash(password, { type: argon2.argon2id });
 
-  const result = await User.findOne({ $or: [{ username }, { email }] });
-  if (result) {
+  const existingUser = await User.findOne(
+    { $or: [{ username }, { email }] },
+    { _id: 1 },
+  );
+
+  if (existingUser) {
     return res.status(409).json({
       error: "The given username or email already exists in our database!",
     });
@@ -97,5 +101,34 @@ router.post("/register", async ({ body }, res) => {
 
 router.use(cookieParser());
 router.use(jwt);
+
+router.get("/posts", async (_, res) => {
+  const posts = await Post.find({}, { _id: 0 }, { createdAt: -1 });
+  return res.json(posts);
+});
+
+const postSchema = z.object({
+  title: z.string().min(1).max(100),
+  content: z.string().min(1).max(4096),
+});
+
+router.post("/posts", async ({ body, user: { username } }, res) => {
+  const { success, data, error } = z.safeParse(postSchema, body);
+  if (!success) return res.status(400).json({ error });
+
+  const post = await Post.create({ ...data, username });
+  return res.json(post.toObject());
+});
+
+/**
+ * Admin only route to get all users
+ * Only route for admins, wanted to keep it simple
+ */
+router.get("/users", async ({ admin }, res) => {
+  if (!admin) return res.status(403).json({ error: "Forbidden" });
+
+  const users = await User.find({}, { _id: 0, hash: 0 }, { createdAt: -1 });
+  return res.json(users);
+});
 
 module.exports = router;
