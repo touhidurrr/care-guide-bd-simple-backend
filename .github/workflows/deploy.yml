@@ -1,0 +1,35 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test:
+    defaults:
+      run:
+        shell: bash
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          check-latest: true
+
+      - name: Install dependencies
+        run: npm install --save-dev
+
+      - name: Deploy
+        run: >
+          BASE_URL='${{ secrets.BASE_URL }}'
+          USERNAME='${{ secrets.AUTO_DEPLOY_USERNAME }}'
+          PASSWORD='${{ secrets.AUTO_DEPLOY_PASSWORD }}'
+          npm run deploy

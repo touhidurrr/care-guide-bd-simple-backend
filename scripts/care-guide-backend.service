@@ -1,0 +1,15 @@
+[Unit]
+Description=Care Guide Backend
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=node start
+Restart=always
+RestartSec=1
+User=care-guide
+# replace `/path/to/Backend` with server repo path
+WorkingDirectory=/path/to/Backend
+
+[Install]
+WantedBy=multi-user.target
