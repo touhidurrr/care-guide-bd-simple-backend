@@ -6,7 +6,8 @@ const cookieParser = require("cookie-parser");
 const jwt = require("../plugins/jwt");
 const { User } = require("../plugins/mongoose");
 
-if (!process.env.JWT_SECRET) {
+const { JWT_SECRET, DOMAIN } = process.env;
+if (!JWT_SECRET) {
   throw new Error("JWT_SECRET is not defined");
 }
 
@@ -20,12 +21,9 @@ const loginSchema = z.object({
   password: z.string().min(6).max(512),
 });
 
-router.post("/login", async (req, res) => {
-  const { success, data, error } = z.safeParse(loginSchema, req.body);
-
-  if (!success) {
-    return res.status(400).json({ error });
-  }
+router.post("/login", async ({ body }, res) => {
+  const { success, data, error } = z.safeParse(loginSchema, body);
+  if (!success) return res.status(400).json({ error });
 
   const { username, password } = data;
   if (!username && !email) {
@@ -56,9 +54,9 @@ router.post("/login", async (req, res) => {
     .setExpirationTime("1 day")
     .setIssuer("CareGuideBD");
 
-  const token = await signer.sign(process.env.JWT_SECRET);
+  const token = await signer.sign(JWT_SECRET);
 
-  const domain = process.env.DOMAIN ?? "localhost";
+  const domain = DOMAIN ?? "localhost";
   return res
     .cookie("token", token, {
       domain,
@@ -76,8 +74,8 @@ const registerSchema = z.object({
   email: z.email(),
 });
 
-router.post("/register", async (req, res) => {
-  const { success, data, error } = z.safeParse(registerSchema, req.body);
+router.post("/register", async ({ body }, res) => {
+  const { success, data, error } = z.safeParse(registerSchema, body);
 
   if (!success) {
     return res.status(400).json({ error });
@@ -88,7 +86,9 @@ router.post("/register", async (req, res) => {
 
   const result = await User.findOne({ $or: [{ username }, { email }] });
   if (result) {
-    return res.status(409).json({ error: "User already exists!" });
+    return res.status(409).json({
+      error: "The given username or email already exists in our database!",
+    });
   }
 
   const user = await User.create({ username, name, email, hash });

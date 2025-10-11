@@ -1,10 +1,11 @@
 const mongoose = require("mongoose");
 
-if (!process.env.MONGO_URL) {
+const { MONGO_URL } = process.env;
+if (!MONGO_URL) {
   throw new Error("MONGO_URL not set");
 }
 
-mongoose.connect(process.env.MONGO_URL, {
+mongoose.connect(MONGO_URL, {
   dbName: "care_guide",
   appName: "Care Guide Backend",
   retryWrites: true,
