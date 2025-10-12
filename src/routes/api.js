@@ -151,7 +151,7 @@ const frontendZipUrl =
 const restartCommands = [
   "git pull",
   "npm install",
-  `curl -L -o frontend.zip '${frontendZipUrl}'`,
+  `wget '${frontendZipUrl}' -O frontend.zip`,
   "unzip -o frontend.zip -d ../care-guide-bd-simple-frontend",
   "rm frontend.zip",
 ];
