@@ -156,6 +156,12 @@ router.get("/users", async ({ user: { admin } }, res) => {
   return res.json(users);
 });
 
+const restartCommands = [
+  "git pull",
+  "npm install",
+  "cd ../care-guide-bd-simple-backend && git pull",
+];
+
 /**
  * Ok, why not also let admins restart the server?
  * We can call this from CI/CD also
@@ -163,9 +169,11 @@ router.get("/users", async ({ user: { admin } }, res) => {
 router.get("/restart", async ({ user: { admin } }, res) => {
   if (!admin) return res.status(403).json({ error: "Forbidden" });
 
-  const outputs = [execSync("git pull")];
+  const outputs = restartCommands.map(
+    (cmd) => `> ${cmd}\n${execSync(cmd).toString("utf8")}`,
+  );
 
-  res.json({ outputs: outputs.map((o) => o.toString("utf8")) });
+  res.end(outputs.join("\n"));
   process.exit(0);
 });
 
