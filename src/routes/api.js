@@ -96,16 +96,10 @@ router.post("/register", async ({ body }, res) => {
     });
   }
 
-  const user = await User.create(
-    { username, name, email, hash },
-    { _id: 0, hash: 0 },
-  );
+  const user = await User.create({ username, name, email, hash });
 
-  const signer = new SignJWT({
-    username: user.username,
-    admin: user.admin,
-    name: user.name,
-  })
+  const { admin } = user;
+  const signer = new SignJWT({ username, admin, name })
     .setProtectedHeader({ alg: "HS512" })
     .setIssuedAt()
     .setExpirationTime("1 day")
@@ -119,7 +113,7 @@ router.post("/register", async ({ body }, res) => {
       secure: true,
       maxAge: 24 * 3600 * 1000,
     })
-    .cookie("admin", user.admin, {
+    .cookie("admin", admin, {
       maxAge: 24 * 3600 * 1000,
     })
     .json({ token, admin });
