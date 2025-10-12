@@ -14,7 +14,7 @@ async function main() {
   const {
     data: { token },
   } = await api.post("/login", {
-    username: USERNAME,
+    usernameOrEmail: USERNAME,
     password: PASSWORD,
   });
 
