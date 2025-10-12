@@ -29,11 +29,7 @@ router.post("/login", async ({ body }, res) => {
   const { success, data, error } = z.safeParse(loginSchema, body);
   if (!success) return res.status(400).json({ error });
 
-  const { username, email, password } = data;
-  if (!username && !email) {
-    return res.status(400).json({ error: "Username or email is required" });
-  }
-
+  const { usernameOrEmail, password } = data;
   const user = await User.findOne(
     {
       $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
