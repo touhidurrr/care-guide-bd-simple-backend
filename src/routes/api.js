@@ -46,11 +46,9 @@ router.post("/login", async ({ body }, res) => {
     return res.status(401).json({ error: "Invalid username or password" });
   }
 
-  const signer = new SignJWT({
-    username: user.username,
-    admin: user.admin,
-    name: user.name,
-  })
+  const { username, admin, name } = user;
+
+  const signer = new SignJWT({ username, admin, name })
     .setProtectedHeader({ alg: "HS512" })
     .setIssuedAt()
     .setExpirationTime("1 day")
@@ -64,7 +62,7 @@ router.post("/login", async ({ body }, res) => {
       secure: true,
       maxAge: 24 * 3600 * 1000,
     })
-    .cookie("admin", user.admin, {
+    .cookie("admin", admin, {
       maxAge: 24 * 3600 * 1000,
     })
     .json({ token, admin });
