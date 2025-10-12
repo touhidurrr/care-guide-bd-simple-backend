@@ -25,7 +25,7 @@ async function main() {
   });
 
   console.log("The server responded with:");
-  console.dir(data, { depth: null });
+  console.log(data);
 }
 
 main().catch((err) => {
