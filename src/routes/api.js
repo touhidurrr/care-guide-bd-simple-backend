@@ -19,8 +19,7 @@ router.use(cookieParser());
 router.use(jwt);
 
 const loginSchema = z.object({
-  email: z.email().optional(),
-  username: z.string().min(1).max(32).optional(),
+  usernameOrEmail: z.union([z.email(), z.string().min(1).max(128)]),
   password: z.string().min(6).max(512),
 });
 
@@ -37,8 +36,7 @@ router.post("/login", async ({ body }, res) => {
 
   const user = await User.findOne(
     {
-      ...(username && { username }),
-      ...(email && { email }),
+      $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
     },
     { _id: 0 },
   );
@@ -70,7 +68,7 @@ router.post("/login", async ({ body }, res) => {
       secure: true,
       maxAge: 24 * 3600 * 1000,
     })
-    .json({ token });
+    .json({ token, admin });
 });
 
 const registerSchema = z.object({
@@ -101,8 +99,30 @@ router.post("/register", async ({ body }, res) => {
     });
   }
 
-  const user = await User.create({ username, name, email, hash }, { _id: 0 });
-  return res.json(user.toObject());
+  const user = await User.create(
+    { username, name, email, hash },
+    { _id: 0, hash: 0 },
+  );
+
+  const signer = new SignJWT({
+    username: user.username,
+    admin: user.admin,
+    name: user.name,
+  })
+    .setProtectedHeader({ alg: "HS512" })
+    .setIssuedAt()
+    .setExpirationTime("1 day")
+    .setIssuer("CareGuideBD");
+
+  const token = await signer.sign(jwtKey);
+
+  return res
+    .cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 24 * 3600 * 1000,
+    })
+    .json({ token, admin });
 });
 
 router.get("/posts", async (_, res) => {
