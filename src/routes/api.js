@@ -58,8 +58,6 @@ router.post("/login", async ({ body }, res) => {
 
   return res
     .cookie("token", token, {
-      httpOnly: true,
-      secure: true,
       maxAge: 24 * 3600 * 1000,
     })
     .cookie("admin", admin, {
@@ -109,8 +107,6 @@ router.post("/register", async ({ body }, res) => {
 
   return res
     .cookie("token", token, {
-      httpOnly: true,
-      secure: true,
       maxAge: 24 * 3600 * 1000,
     })
     .cookie("admin", admin, {
