@@ -152,6 +152,7 @@ const restartCommands = [
   "git pull",
   "npm install",
   `wget '${frontendZipUrl}' -O frontend.zip`,
+  "rm -rf ../care-guide-bd-simple-frontend",
   "unzip -o frontend.zip -d ../care-guide-bd-simple-frontend",
   "rm frontend.zip",
 ];
