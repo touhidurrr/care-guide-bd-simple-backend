@@ -64,6 +64,9 @@ router.post("/login", async ({ body }, res) => {
       secure: true,
       maxAge: 24 * 3600 * 1000,
     })
+    .cookie("admin", user.admin, {
+      maxAge: 24 * 3600 * 1000,
+    })
     .json({ token, admin });
 });
 
@@ -116,6 +119,9 @@ router.post("/register", async ({ body }, res) => {
     .cookie("token", token, {
       httpOnly: true,
       secure: true,
+      maxAge: 24 * 3600 * 1000,
+    })
+    .cookie("admin", user.admin, {
       maxAge: 24 * 3600 * 1000,
     })
     .json({ token, admin });
