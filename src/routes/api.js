@@ -145,10 +145,15 @@ router.get("/users", async ({ user: { admin } }, res) => {
   return res.json(users);
 });
 
+const frontendZipUrl =
+  "https://github.com/touhidurrr/care-guide-bd-simple-frontend/releases/latest/download/frontend.zip";
+
 const restartCommands = [
   "git pull",
   "npm install",
-  "cd ../care-guide-bd-simple-backend && git pull",
+  `wget '${frontendZipUrl}'`,
+  "unzip -o frontend.zip -d ../care-guide-bd-simple-frontend",
+  "rm frontend.zip",
 ];
 
 /**
