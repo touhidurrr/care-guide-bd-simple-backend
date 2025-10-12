@@ -129,7 +129,8 @@ router.post("/posts", async ({ body, user: { username } }, res) => {
   const { success, data, error } = z.safeParse(postSchema, body);
   if (!success) return res.status(400).json({ error });
 
-  const post = await Post.create({ ...data, username });
+  const { title, content } = data;
+  const post = await Post.create({ title, content, username });
   return res.json(post.toObject());
 });
 
