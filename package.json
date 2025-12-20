@@ -1,6 +1,6 @@
 {
   "name": "care-guide-bd-simple-backend",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A simple backend made for Care Guide BD interview process",
   "main": "src/index.js",
   "scripts": {
