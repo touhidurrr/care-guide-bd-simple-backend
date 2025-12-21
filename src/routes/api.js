@@ -150,7 +150,7 @@ const frontendZipUrl =
 
 const restartCommands = [
   "git pull",
-  "npm install",
+  `${process.versions.bun ? "bun" : "npm"} install`,
   `wget '${frontendZipUrl}' -O frontend.zip`,
   "rm -rf ../care-guide-bd-simple-frontend",
   "unzip -o frontend.zip -d ../care-guide-bd-simple-frontend",
